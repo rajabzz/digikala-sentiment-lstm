@@ -1,24 +1,45 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import json
 import random
 import re
 import pickle
+import argparse
 
 import numpy as np
+print "here"
+from sklearn.model_selection import train_test_split
+from hazm import word_tokenize, Normalizer
+
+parser = argparse.ArgumentParser(prog='digikala-sentiment-lstm')
+
+parser.add_argument('--data_path', '-d', help='Data locations', default='data')
+parser.add_argument('--max_length', '-m', help='Maximum length of comments', type=int, default=128)
+parser.add_argument('--batch_size', '-b', help='Batch size', type=int, default=20)
+parser.add_argument('--seed', '-s', help='Random seed', type=int, default=42) # The true answer!
+parser.add_argument('--training_data_ready', '-t', help='Pass when trainning data is ready', action='store_true')
+parser.add_argument('--data_model_ready', '-M', help='Pass when data model is ready', action='store_true')
+
+parser.description = "Trains a simple LSTM model on the Digikala product comment dataset for the sentiment classification task" #TODO
+
+parser.epilog = "Have a look at https://github.com/rajabzz/digikala-sentiment-lstm/"
+
+args = parser.parse_args()
+
+# Moved down to prevent getting Using * backend message when given -h flag
 from keras.layers import Dense, Embedding, LSTM
 from keras.layers.wrappers import Bidirectional
 from keras.models import Sequential, load_model
 from keras.preprocessing import sequence
-from sklearn.model_selection import train_test_split
-from hazm import word_tokenize, Normalizer
 
-data_filepath = 'data'
+data_filepath = args.data_path
 
-max_length_of_comment = 128
-batch_size = 20
-random.seed(42)
+batch_size = args.batch_size
+random.seed(args.seed)
 
-is_training_data_ready = False
-is_data_model_ready = False
+is_training_data_ready = args.training_data_ready
+is_data_model_ready = args.data_model_ready
+
 
 normalizer = Normalizer()
 
