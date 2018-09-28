@@ -124,7 +124,7 @@ if is_training_data_ready:
         X, y, word_idx = pickle.load(f)
 else:
     print('Filtering data...')
-    products = filter_data(data_filepath, 'comments_3.jl')
+    products = filter_data(data_filepath, 'results.jl')
 
     print('Processing data...')
     all_comments = process_data(products)
