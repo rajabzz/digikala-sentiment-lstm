@@ -1,5 +1,5 @@
 # digikala-sentiment-lstm
-> 🧠Trains a simple LSTM model on the Digikala sentiment classification task
+> 🧠Trains a simple LSTM model on the Digikala product comment dataset for the sentiment classification task
 
 ![](sample.gif)
 
@@ -14,7 +14,7 @@ $ mkdir data
 $ mkdir models
 $ pip install -r requirements.txt
 ```
-Copy your dataset to `data` folder. If you don't have any dataset, consider using [digikala-crawler](https://github.com/rajabzz/digikala-crawler).
+Copy your dataset to the `data` folder. If you don't have a dataset, consider using [digikala-crawler](https://github.com/rajabzz/digikala-crawler).
 
 ## Running The Program
 The following command preprocesses the data, trains the LSTM model, evaluates it and starts an interactive mode for user's manual inputs:
