@@ -2,6 +2,7 @@ import json
 import random
 import re
 import pickle
+import sys
 
 import numpy as np
 from keras.layers import Dense, Embedding, LSTM
@@ -113,10 +114,7 @@ def create_model(vocab_size):
     return model
 
 
-if is_training_data_ready:
-    with open('processed_data.pickle', 'rb') as f:
-        X, y, word_idx = pickle.load(f)
-else:
+def load_dataset():
     print('Filtering data...')
     products = filter_data(DATA_PATH, 'comments_3.jl')
 
@@ -135,22 +133,41 @@ else:
     with open('processed_data.pickle', 'wb') as f:
         pickle.dump((X, y, word_idx), f)
 
+    return X, y, word_idx
+
+
+X = None
+y = None
+word_idx = None
+model = None
+for arg in sys.argv[1:]:
+    if arg.startswith('--dataset='):
+        try:
+            with open(arg[arg.index('=') + 1:], 'rb') as f:
+                X, y, word_idx = pickle.load(f)
+        except Exception as e:
+            print(e)
+    if arg.startswith('--model='):
+        try:
+            model = load_model(arg[arg.index('=') + 1:])
+        except Exception as e:
+            print(e)
+
+if X is None or y is None or word_idx is None:
+    X, y, word_idx = load_dataset()
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 X_train = sequence.pad_sequences(X_train, maxlen=MAX_LENGTH_OF_COMMENT)
 X_test = sequence.pad_sequences(X_test, maxlen=MAX_LENGTH_OF_COMMENT)
 
-if is_data_model_ready:
-    model = load_model('models/model.h5')
-else:
+if model is None:
     model = create_model(len(word_idx))
     model.fit(X_train, y_train,
               batch_size=BATCH_SIZE,
               epochs=2,
               validation_data=(X_test, y_test))
     model.save('models/model.h5')
-
 
 y_pred = model.predict(X_test, batch_size=BATCH_SIZE)
 
@@ -176,7 +193,6 @@ for i in range(y_pred.shape[0]):
     if label == plabel:
         acc_sum += 1
         true_count[label] += 1
-
 
 print('acc', acc_sum / y_pred.shape[0])
 print(real_count)
@@ -209,5 +225,3 @@ while True:
     result = model.predict(X_interactive)
     print(' - : ', str(round(result[0][0] * 100, 4)) + '%')
     print(' + : ', str(round(result[0][1] * 100, 4)) + '%', '\n')
-
-
