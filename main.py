@@ -10,15 +10,9 @@ from keras.models import Sequential, load_model
 from keras.preprocessing import sequence
 from sklearn.model_selection import train_test_split
 from hazm import word_tokenize, Normalizer
+from constants import *
 
-data_filepath = 'data'
-
-max_length_of_comment = 128
-batch_size = 20
 random.seed(42)
-
-is_training_data_ready = False
-is_data_model_ready = False
 
 normalizer = Normalizer()
 
@@ -124,7 +118,7 @@ if is_training_data_ready:
         X, y, word_idx = pickle.load(f)
 else:
     print('Filtering data...')
-    products = filter_data(data_filepath, 'comments_3.jl')
+    products = filter_data(DATA_PATH, 'comments_3.jl')
 
     print('Processing data...')
     all_comments = process_data(products)
@@ -144,21 +138,21 @@ else:
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-X_train = sequence.pad_sequences(X_train, maxlen=max_length_of_comment)
-X_test = sequence.pad_sequences(X_test, maxlen=max_length_of_comment)
+X_train = sequence.pad_sequences(X_train, maxlen=MAX_LENGTH_OF_COMMENT)
+X_test = sequence.pad_sequences(X_test, maxlen=MAX_LENGTH_OF_COMMENT)
 
 if is_data_model_ready:
     model = load_model('models/model.h5')
 else:
     model = create_model(len(word_idx))
     model.fit(X_train, y_train,
-              batch_size=batch_size,
+              batch_size=BATCH_SIZE,
               epochs=2,
               validation_data=(X_test, y_test))
     model.save('models/model.h5')
 
 
-y_pred = model.predict(X_test, batch_size=batch_size)
+y_pred = model.predict(X_test, batch_size=BATCH_SIZE)
 
 acc_sum = 0
 
@@ -211,7 +205,7 @@ while True:
     text = input('comment: ')
     tokens = tokenize_text(text)
     tokens_idx = [[word_idx.get(token, word_idx['UNK']) for token in tokens]]
-    X_interactive = sequence.pad_sequences(tokens_idx, maxlen=max_length_of_comment)
+    X_interactive = sequence.pad_sequences(tokens_idx, maxlen=MAX_LENGTH_OF_COMMENT)
     result = model.predict(X_interactive)
     print(' - : ', str(round(result[0][0] * 100, 4)) + '%')
     print(' + : ', str(round(result[0][1] * 100, 4)) + '%', '\n')
