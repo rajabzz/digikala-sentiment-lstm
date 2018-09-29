@@ -5,6 +5,7 @@ import random
 import re
 import pickle
 import argparse
+import logging
 
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -19,6 +20,7 @@ parser.add_argument('--seed', '-s', help='Random seed', type=int, default=42) # 
 parser.add_argument('--training_data_ready', '-t', help='Pass when trainning data is ready', action='store_true')
 parser.add_argument('--data_model_ready', '-M', help='Pass when data model is ready', action='store_true')
 parser.add_argument('--interactive', '-i', help='Interactive mode', action='store_true')
+parser.add_argument('--verbosity', '-v', help='verbosity, stackable. 0: Error, 1: Warning, 2: Info, 3: Debug', action='count')
 
 parser.description = "Trains a simple LSTM model on the Digikala product comment dataset for the sentiment classification task"
 
@@ -41,6 +43,22 @@ is_training_data_ready = args.training_data_ready
 is_data_model_ready = args.data_model_ready
 
 interactive_mode = args.interactive
+
+verbosity = args.verbosity
+if not verbosity:
+  verbosity = 0;
+
+# Logging config
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level= 40 - verbosity*10)
+'''
+You should now use one of the following:
+print for data output
+logging.debug for code debug
+logging.info for events occuring, like status monitors
+logging.warn for avoidable warning
+logging.warning for non-avoidable warning
+logging.error, logging.exception, logging.critical for appropriate erros (there don't raise exception, you have to do that yourself)
+'''
 
 normalizer = Normalizer()
 
