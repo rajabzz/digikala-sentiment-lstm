@@ -1,24 +1,64 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import json
 import random
 import re
 import pickle
+import argparse
+import logging
 
 import numpy as np
+from sklearn.model_selection import train_test_split
+from hazm import word_tokenize, Normalizer
+
+parser = argparse.ArgumentParser(prog='digikala-sentiment-lstm')
+
+parser.add_argument('--data_path', '-d', help='Data locations', default='data')
+parser.add_argument('--max_length', '-m', help='Maximum length of comments', type=int, default=128)
+parser.add_argument('--batch_size', '-b', help='Batch size', type=int, default=20)
+parser.add_argument('--seed', '-s', help='Random seed', type=int, default=42) # The true answer!
+parser.add_argument('--training_data_ready', '-t', help='Pass when trainning data is ready', action='store_true')
+parser.add_argument('--data_model_ready', '-M', help='Pass when data model is ready', action='store_true')
+parser.add_argument('--interactive', '-i', help='Interactive mode', action='store_true')
+parser.add_argument('--verbosity', '-v', help='verbosity, stackable. 0: Error, 1: Warning, 2: Info, 3: Debug', action='count')
+
+parser.description = "Trains a simple LSTM model on the Digikala product comment dataset for the sentiment classification task"
+
+parser.epilog = "Have a look at https://github.com/rajabzz/digikala-sentiment-lstm/"
+
+args = parser.parse_args()
+
+# Moved down to prevent getting Using * backend message when given -h flag
 from keras.layers import Dense, Embedding, LSTM
 from keras.layers.wrappers import Bidirectional
 from keras.models import Sequential, load_model
 from keras.preprocessing import sequence
-from sklearn.model_selection import train_test_split
-from hazm import word_tokenize, Normalizer
 
-data_filepath = 'data'
+data_filepath = args.data_path
 
-max_length_of_comment = 128
-batch_size = 20
-random.seed(42)
+batch_size = args.batch_size
+random.seed(args.seed)
 
-is_training_data_ready = False
-is_data_model_ready = False
+is_training_data_ready = args.training_data_ready
+is_data_model_ready = args.data_model_ready
+
+interactive_mode = args.interactive
+
+verbosity = args.verbosity
+if not verbosity:
+  verbosity = 0;
+
+# Logging config
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level= 40 - verbosity*10)
+'''
+You should now use one of the following:
+print for data output
+logging.debug for code debug
+logging.info for events occuring, like status monitors
+logging.warn for avoidable warning
+logging.warning for non-avoidable warning
+logging.error, logging.exception, logging.critical for appropriate erros (there don't raise exception, you have to do that yourself)
+'''
 
 normalizer = Normalizer()
 
@@ -207,7 +247,7 @@ print("f1-", f1_negative)
 print("f1+", f1_positive)
 
 print('>>> Interactive mode')
-while True:
+while interactive_mode:
     text = input('comment: ')
     tokens = tokenize_text(text)
     tokens_idx = [[word_idx.get(token, word_idx['UNK']) for token in tokens]]
