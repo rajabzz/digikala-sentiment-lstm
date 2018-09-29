@@ -7,7 +7,6 @@ import pickle
 import argparse
 
 import numpy as np
-print "here"
 from sklearn.model_selection import train_test_split
 from hazm import word_tokenize, Normalizer
 
@@ -19,8 +18,9 @@ parser.add_argument('--batch_size', '-b', help='Batch size', type=int, default=2
 parser.add_argument('--seed', '-s', help='Random seed', type=int, default=42) # The true answer!
 parser.add_argument('--training_data_ready', '-t', help='Pass when trainning data is ready', action='store_true')
 parser.add_argument('--data_model_ready', '-M', help='Pass when data model is ready', action='store_true')
+parser.add_argument('--interactive', '-i', help='Interactive mode', action='store_true')
 
-parser.description = "Trains a simple LSTM model on the Digikala product comment dataset for the sentiment classification task" #TODO
+parser.description = "Trains a simple LSTM model on the Digikala product comment dataset for the sentiment classification task"
 
 parser.epilog = "Have a look at https://github.com/rajabzz/digikala-sentiment-lstm/"
 
@@ -40,6 +40,7 @@ random.seed(args.seed)
 is_training_data_ready = args.training_data_ready
 is_data_model_ready = args.data_model_ready
 
+interactive_mode = args.interactive
 
 normalizer = Normalizer()
 
@@ -228,7 +229,7 @@ print("f1-", f1_negative)
 print("f1+", f1_positive)
 
 print('>>> Interactive mode')
-while True:
+while interactive_mode:
     text = input('comment: ')
     tokens = tokenize_text(text)
     tokens_idx = [[word_idx.get(token, word_idx['UNK']) for token in tokens]]
