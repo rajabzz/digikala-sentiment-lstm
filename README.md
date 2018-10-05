@@ -29,7 +29,7 @@ which uses the specified (full) path to read the raw data.
 ```bash
 $ python main.py --training_data_ready --processed_pickle_data_path=processed_data.pickle
 ```
-which uses the specified path to read the preprocessed data (from the previous step)
+which uses the specified path to read the pre-processed data (from the previous step)
 which is essentially the training data.
 ```bash
 python main.py --data_model_ready --model_path=models/model.h5
@@ -48,3 +48,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Task List
 - [ ] Split the code into multiple files.
+- [x] <del>Use `sys.argv` instead of manually changing the variables inside the code.</del>
