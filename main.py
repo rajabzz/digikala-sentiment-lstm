@@ -11,16 +11,23 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from hazm import word_tokenize, Normalizer
 
+from defaults import *
+
 parser = argparse.ArgumentParser(prog='digikala-sentiment-lstm')
 
-parser.add_argument('--data_path', '-d', help='Data locations', default='data')
-parser.add_argument('--max_length', '-m', help='Maximum length of comments', type=int, default=128)
-parser.add_argument('--batch_size', '-b', help='Batch size', type=int, default=20)
-parser.add_argument('--seed', '-s', help='Random seed', type=int, default=42) # The true answer!
+parser.add_argument('--full_data_path', '-d', help='Full path of data', default=FULL_DATA_PATH)
+parser.add_argument('--model_path', '-P', help='Full path of model', default=MODEL_PATH)
+parser.add_argument('--processed_pickle_data_path', '-p', help='Full path of processed pickle data',
+                    default=PROCESSED_PICKLE_DATA_PATH)
+parser.add_argument('--max_length', '-m', help='Maximum length of comments', type=int, default=COMMENT_MAX_LENGTH)
+parser.add_argument('--batch_size', '-b', help='Batch size', type=int, default=BATCH_SIZE)
+parser.add_argument('--seed', '-s', help='Random seed', type=int, default=SEED)  # The true answer!
+parser.add_argument('--epoch', '-e', help='Epochs', type=int, default=EPOCH)
 parser.add_argument('--training_data_ready', '-t', help='Pass when trainning data is ready', action='store_true')
 parser.add_argument('--data_model_ready', '-M', help='Pass when data model is ready', action='store_true')
 parser.add_argument('--interactive', '-i', help='Interactive mode', action='store_true')
-parser.add_argument('--verbosity', '-v', help='verbosity, stackable. 0: Error, 1: Warning, 2: Info, 3: Debug', action='count')
+parser.add_argument('--verbosity', '-v', help='verbosity, stackable. 0: Error, 1: Warning, 2: Info, 3: Debug',
+                    action='count')
 
 parser.description = "Trains a simple LSTM model on the Digikala product comment dataset for the sentiment classification task"
 
@@ -34,22 +41,27 @@ from keras.layers.wrappers import Bidirectional
 from keras.models import Sequential, load_model
 from keras.preprocessing import sequence
 
-data_filepath = args.data_path
+full_data_path = args.full_data_path
 
 batch_size = args.batch_size
 random.seed(args.seed)
 
 is_training_data_ready = args.training_data_ready
 is_data_model_ready = args.data_model_ready
+pickle_data_path = args.processed_pickle_data_path
+model_path = args.model_path
+epoch = args.epoch
 
 interactive_mode = args.interactive
 
+max_length_of_comment = args.max_length
+
 verbosity = args.verbosity
 if not verbosity:
-  verbosity = 0;
+    verbosity = 0
 
 # Logging config
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level= 40 - verbosity*10)
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=40 - verbosity * 10)
 '''
 You should now use one of the following:
 print for data output
@@ -63,8 +75,8 @@ logging.error, logging.exception, logging.critical for appropriate erros (there 
 normalizer = Normalizer()
 
 
-def filter_data(filepath, filename):
-    with open('{}/{}'.format(filepath, filename), 'r', encoding='utf8') as f:
+def filter_data(full_path):
+    with open(full_path, 'r', encoding='utf8') as f:
         products = []
         for row in f.readlines():
             raw_data = json.loads(row)
@@ -160,11 +172,11 @@ def create_model(vocab_size):
 
 
 if is_training_data_ready:
-    with open('processed_data.pickle', 'rb') as f:
+    with open(pickle_data_path, 'rb') as f:  # default: processed_data.pickle
         X, y, word_idx = pickle.load(f)
 else:
     print('Filtering data...')
-    products = filter_data(data_filepath, 'results.jl')
+    products = filter_data(full_data_path)  # default: data/results.jl
 
     print('Processing data...')
     all_comments = process_data(products)
@@ -178,9 +190,8 @@ else:
     print('Prepare training data...')
     X, y = prepare_training_data(all_comments, word_idx)
 
-    with open('processed_data.pickle', 'wb') as f:
+    with open(PROCESSED_PICKLE_DATA_PATH, 'wb') as f:
         pickle.dump((X, y, word_idx), f)
-
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -188,15 +199,14 @@ X_train = sequence.pad_sequences(X_train, maxlen=max_length_of_comment)
 X_test = sequence.pad_sequences(X_test, maxlen=max_length_of_comment)
 
 if is_data_model_ready:
-    model = load_model('models/model.h5')
+    model = load_model(model_path)
 else:
     model = create_model(len(word_idx))
     model.fit(X_train, y_train,
               batch_size=batch_size,
-              epochs=2,
+              epochs=epoch,
               validation_data=(X_test, y_test))
-    model.save('models/model.h5')
-
+    model.save(MODEL_PATH)
 
 y_pred = model.predict(X_test, batch_size=batch_size)
 
@@ -222,7 +232,6 @@ for i in range(y_pred.shape[0]):
     if label == plabel:
         acc_sum += 1
         true_count[label] += 1
-
 
 print('acc', acc_sum / y_pred.shape[0])
 print(real_count)
@@ -255,5 +264,3 @@ while interactive_mode:
     result = model.predict(X_interactive)
     print(' - : ', str(round(result[0][0] * 100, 4)) + '%')
     print(' + : ', str(round(result[0][1] * 100, 4)) + '%', '\n')
-
-
