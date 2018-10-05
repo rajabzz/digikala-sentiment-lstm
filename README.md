@@ -21,27 +21,19 @@ The following command pre-processes the data, trains the LSTM model, evaluates i
 ```bash
 $ python main.py
 ```
-There exists some commandline arguments to make it even faster:
+In the case where you need to address the full path of the raw data (instead of the default path), use the following command:
 ```bash
-$ python main.py --full_data_path=data/results.jl
+$ python main.py --full_data_path=path/to/data.jl
 ```
-which uses the specified (full) path to read the raw data.
+
+After training, the trained model will be saved. You can use this model instead of training a new one, by using the following command:
 ```bash
-$ python main.py --training_data_ready --processed_pickle_data_path=processed_data.pickle
+$ python main.py --data_model_ready --model_path=models/model.h5
 ```
-which uses the specified path to read the pre-processed data (from the previous step)
-which is essentially the training data.
+For more information on other options:
 ```bash
-python main.py --data_model_ready --model_path=models/model.h5
+$ python main.py --help
 ```
-which uses the specified path to read the saved model.
-```bash
-python main.py --max_length=128 --batch_size=20 --seed=42 --epoch=5
-```
-which tells the program to alter the defaults for maximum comment length,
-batch size for model training, seed for the random object and number of epochs
-for model training respectively. The specified values are actually the default
-values.
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
