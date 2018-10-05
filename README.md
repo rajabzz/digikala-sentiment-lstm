@@ -17,16 +17,16 @@ $ pip install -r requirements.txt
 Copy your dataset to the `data` folder. If you don't have a dataset, consider using [digikala-crawler](https://github.com/rajabzz/digikala-crawler).
 
 ## Running The Program
-The following command pre-processes the data, trains the LSTM model, evaluates it and starts an interactive mode for user's manual inputs:
+The following command pre-processes the data, trains the LSTM model, evaluates it and starts an interactive mode for the user's manual inputs:
 ```bash
 $ python main.py
 ```
-In the case where you need to address the full path of the raw data (instead of the default path), use the following command:
+In case where you need to override the default path for the raw data, use the following command:
 ```bash
 $ python main.py --full_data_path=path/to/data.jl
 ```
 
-After training, the trained model will be saved. You can use this model instead of training a new one, by using the following command:
+After training, the trained model will be saved. You can use this model instead of training a new one by using the following command:
 ```bash
 $ python main.py --data_model_ready --model_path=models/model.h5
 ```
