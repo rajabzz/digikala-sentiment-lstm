@@ -28,7 +28,7 @@ $ python main.py --full_data_path=path/to/data.jl
 
 After training, the trained model will be saved. You can use this model instead of training a new one by using the following command:
 ```bash
-$ python main.py --data_model_ready --model_path=models/model.h5
+$ python main.py -t -M --data_model_ready --model_path=models/model.h5
 ```
 For more information on other options:
 ```bash
