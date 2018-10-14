@@ -17,15 +17,27 @@ $ pip install -r requirements.txt
 Copy your dataset to the `data` folder. If you don't have a dataset, consider using [digikala-crawler](https://github.com/rajabzz/digikala-crawler).
 
 ## Running The Program
-The following command preprocesses the data, trains the LSTM model, evaluates it and starts an interactive mode for user's manual inputs:
+The following command pre-processes the data, trains the LSTM model, evaluates it and starts an interactive mode for the user's manual inputs:
 ```bash
 $ python main.py
 ```
-You can read preprocessed data or use pretrained model by changing corresponding variables in `main.py` file.
+In case where you need to override the default path for the raw data, use the following command:
+```bash
+$ python main.py --full_data_path=path/to/data.jl
+```
+
+After training, the trained model will be saved. You can use this model instead of training a new one by using the following command:
+```bash
+$ python main.py -t -M --data_model_ready --model_path=models/model.h5
+```
+For more information on other options:
+```bash
+$ python main.py --help
+```
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
 
 ## Task List
 - [ ] Split the code into multiple files.
-- [ ] Use `sys.argv` instead of manually changing the variables inside the code.
+- [x] <del>Use `sys.argv` instead of manually changing the variables inside the code.</del>
