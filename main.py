@@ -21,7 +21,7 @@ parser.add_argument('--processed_pickle_data_path', '-p', help='Full path of pro
                     default=PROCESSED_PICKLE_DATA_PATH)
 parser.add_argument('--max_length', '-m', help='Maximum length of comments', type=int, default=COMMENT_MAX_LENGTH)
 parser.add_argument('--batch_size', '-b', help='Batch size', type=int, default=BATCH_SIZE)
-parser.add_argument('--seed', '-s', help='Random seed', type=int, default=SEED)  # The true answer!
+parser.add_argument('--seed', '-s', help='Random seed', type=int, default=SEED)
 parser.add_argument('--epoch', '-e', help='Epochs', type=int, default=EPOCH)
 parser.add_argument('--training_data_ready', '-t', help='Pass when trainning data is ready', action='store_true')
 parser.add_argument('--data_model_ready', '-M', help='Pass when data model is ready', action='store_true')
