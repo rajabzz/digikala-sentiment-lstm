@@ -9,7 +9,7 @@ Keras-Applications==1.0.4
 Keras-Preprocessing==1.0.2
 libwapiti==0.2.1
 Markdown==2.6.11
-nltk==3.0.5
+nltk==3.4.5
 numpy==1.14.5
 protobuf==3.6.1
 PyYAML==5.1
